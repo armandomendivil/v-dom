@@ -1,8 +1,10 @@
-import { isDef, isUndef } from './shared/util';
+import { mount } from './vdom';
+import createElement from './vdom/create-element';
 
-const a = 5;
-const b = undefined;
-console.log(isDef(a));
+const myApp = createElement('div', { className: 'my-class' }, [
+  createElement('h1', { className: 'my-header' }, ['Hello']),
+  createElement('hp', { }, ['A container paragraph']),
+]);
 
-console.log(isUndef(b));
-
+const root = document.body;
+mount(myApp, root);
