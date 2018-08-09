@@ -1,12 +1,23 @@
-import { mount } from './vdom';
+import { mount, Component } from './vdom';
+
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {};
+  }
+
+  render() {
+    return (
+      <div>
+        <ul>
+          <li>item 1</li>
+          <li>item 2</li>
+        </ul>
+      </div>
+    );
+  }
+}
+
 const root = document.body;
-
-let App = <div>
-  <ul>
-    <li>item 1</li>
-    <li>item 2</li>
-  </ul>
-</div>;  
-
-console.log(App)
-mount(App, root);
+mount(h(App), root);
