@@ -1,4 +1,5 @@
 import { isDef, isPrimitive, isFunction, isString } from '../shared/util';
+import setTextContent from './setTextContent';
 
 export function h(type, props, ...children) {
   props = props || {};
@@ -30,10 +31,6 @@ export function createVComponent(type, props) {
     props,
     dom: null,
   };
-}
-
-export function mountVText(vText, parentDOMNode) {
-  parentDOMNode.textContent = vText;
 }
 
 export function mountVElement(vElement, parentDOMNode) {
@@ -68,8 +65,9 @@ export function mountVComponent(vComponent, parentDOMNode) {
   const { props, type } = vComponent;
 
   const Component = type;
-  const instance = new Component(props);
 
+  const instance = new Component(props);
+ 
   const nextElement = instance.render();
 
   instance._currentElement = nextElement;
@@ -89,7 +87,7 @@ export function mountVComponent(vComponent, parentDOMNode) {
 export function mount(input, parentDOMNode) {
   if (isPrimitive(input)) {
     // Text input
-    return mountVText(input, parentDOMNode);
+    return setTextContent(parentDOMNode, input);
   } else if (isFunction(input.type)) {
     // Component input
     return mountVComponent(input, parentDOMNode);
