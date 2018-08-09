@@ -11,8 +11,16 @@ export function isTrue (v) {
   return v === true;
 }
 
-export function isFalse(v) {
+export function isFalse (v) {
   return v === false;
+}
+
+export function isFunction (v) {
+  return typeof v === 'function';
+}
+
+export function isString (v) {
+  return typeof v === 'string';
 }
 
 export function isPrimitive (v) {

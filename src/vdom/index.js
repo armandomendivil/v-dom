@@ -1,30 +1,33 @@
-import { isDef, isPrimitive } from '../shared/util';
+import { isDef, isPrimitive, isFunction, isString } from '../shared/util';
 
-export function mount(input, parentDOMNode) {
-  if (isPrimitive(input)) {
-    mountText(input, parentDOMNode);
-  } else {
-    mountElement(input, parentDOMNode);
-  }
+export function h(type, props, ...children) {
+  props = props || {};
+
+  return {
+    type,
+    props,
+    children,
+    dom: null,
+  };
+};
+
+global.h = h;
+
+export function mountVText(vText, parentDOMNode) {
+  parentDOMNode.textContent = vText;
 }
 
-export function mountElement(vnode, parentDOMNode) {
-  const { tag, className, props, style } = vnode;
+export function mountVElement(vElement, parentDOMNode) {
+  const domNode = document.createElement(vElement.type);
 
-  const domNode = document.createElement(tag);
+  vElement.dom = domNode;
 
-  vnode.dom = domNode;
-
-  if (props.children) {
-    props.children.forEach(child => mount(child, domNode));
-  }
-
-  if (isDef(className)) {
-    domNode.className = className;
-  }
-
-  if (isDef(style)) {
-    Object.keys(style).forEach(skey => domNode.style[skey] = style[skey]);
+  if (vElement.children) {
+    if (!Array.isArray(vElement.children)) {
+      mount(vElement.children, domNode);
+    } else {
+      vElement.children.forEach(child => mount(child, domNode));
+    }
   }
 
   parentDOMNode.appendChild(domNode);
@@ -32,6 +35,18 @@ export function mountElement(vnode, parentDOMNode) {
   return domNode;
 }
 
-export function mountText (text, parentDOMNode) {
-  parentDOMNode.textContent = text;
+export function mountvComponent(vComponent, parentDOMNode) {
+}
+
+export function mount(input, parentDOMNode) {
+  if (isPrimitive(input)) {
+    // Text input
+    return mountVText(input, parentDOMNode);
+  } else if (isFunction(input.type)) {
+    // Component input
+    return mountVComponent(input, parentDOMNode);
+  } else if (isString(input.type)) {
+    // Element input
+    return mountVElement(input, parentDOMNode);
+  }
 }

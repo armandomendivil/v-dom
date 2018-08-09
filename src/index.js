@@ -1,10 +1,12 @@
 import { mount } from './vdom';
-import createElement from './vdom/create-element';
-
-const myApp = createElement('div', { className: 'my-class' }, [
-  createElement('h1', { className: 'my-header' }, ['Hello']),
-  createElement('hp', { }, ['A container paragraph']),
-]);
-
 const root = document.body;
-mount(myApp, root);
+
+let App = <div>
+  <ul>
+    <li>item 1</li>
+    <li>item 2</li>
+  </ul>
+</div>;  
+
+console.log(App)
+mount(App, root);
