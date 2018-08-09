@@ -42,13 +42,20 @@ export function mountVElement(vElement, parentDOMNode) {
   const domNode = document.createElement(vElement.type);
   vElement.dom = domNode;
 
-  if (isDef(children)) {
+  if (Array.isArray(children)) {
     children.forEach(child => mount(child, domNode));
   }
 
   if (isDef(props.className)) {
     domNode.className = props.className;
   }
+
+  if (isDef(props.style)) {
+    Object.keys(style).forEach(sKey => domNode.style[sKey] = style[sKey]);
+  }
+
+  addEventListeners(domNode, vElement.props);
+
   parentDOMNode.appendChild(domNode);
 
   return domNode;
@@ -78,6 +85,25 @@ export function mount(input, parentDOMNode) {
     // Element input
     return mountVElement(input, parentDOMNode);
   }
+}
+
+export function isEventProp (name) {
+  return /^on/.test(name);
+}
+
+export function extractEventName (name) {
+  return name.slice(2).toLowerCase();
+}
+
+export function addEventListeners ($target, props) {
+  Object.keys(props).forEach(name => {
+    if (isEventProp(name)) {
+      $target.addEventListener(
+        extractEventName(name),
+        props[name]
+      );
+    }
+  });
 }
 
 export class Component {

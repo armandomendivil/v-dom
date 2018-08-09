@@ -4,16 +4,25 @@ import { mount, Component } from './vdom';
 class App extends Component {
   constructor() {
     super();
-    this.state = {};
+    this.state = {
+      count: 1,
+    };
+
+    this.onIncrease = this.onIncrease.bind(this);
+    this.onDecrease = this.onDecrease.bind(this);
   }
+
+  onIncrease() {
+    console.log('Increase');
+  }
+
+  onDecrease() {}
 
   render() {
     return (
       <div>
-        <ul>
-          <li>item 1</li>
-          <li>item 2</li>
-        </ul>
+        <button onClick={this.onIncrease}>click</button>
+        <h3>{this.state.count}</h3>
       </div>
     );
   }
