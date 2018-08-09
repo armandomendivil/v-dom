@@ -2,13 +2,13 @@ import { isDef, isPrimitive, isFunction, isString } from '../shared/util';
 
 export function h(type, props, ...children) {
   props = props || {};
-  console.log(type)
+
   if (isFunction(type)) {
     const vNode = createVComponent(type, props);
     return vNode;
   }
 
-  const vNode = createVElement(type, props, children);
+  const vNode = createVElement(type, props, ...children);
 
   return vNode;
 };
@@ -16,7 +16,6 @@ export function h(type, props, ...children) {
 global.h = h;
 
 export function createVElement(type, props, ...children) {
-  console.log('Create element')
   return {
     type,
     props,
@@ -39,26 +38,26 @@ export function mountVText(vText, parentDOMNode) {
 }
 
 export function mountVElement(vElement, parentDOMNode) {
+  const { children, props } = vElement;
   const domNode = document.createElement(vElement.type);
-
   vElement.dom = domNode;
 
-  if (vElement.children) {
-    if (!Array.isArray(vElement.children)) {
-      mount(vElement.children, domNode);
-    } else {
-      vElement.children.forEach(child => mount(child, domNode));
-    }
+  if (isDef(children)) {
+    children.forEach(child => mount(child, domNode));
   }
 
+  if (isDef(props.className)) {
+    domNode.className = props.className;
+  }
   parentDOMNode.appendChild(domNode);
 
   return domNode;
 }
 
 export function mountVComponent(vComponent, parentDOMNode) {
-  const Component = vComponent.type;
-  const instance = new Component(vComponent.props);
+  const { props, type } = vComponent;
+  const Component = type;
+  const instance = new Component(props);
 
   const nextElement = instance.render();
   const dom = mount(nextElement, parentDOMNode);
