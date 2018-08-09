@@ -143,11 +143,11 @@ export function updateVComponent (prevComponent, nextComponent) {
   const { _currentElement } = _instance;
 
   const prevProps = prevComponent.props;
-  const nextprops = nextComponent.props;
+  const nextProps = nextComponent.props;
 
   nextComponent.dom = prevComponent.dom;
   nextComponent._instance = _instance;
-  nextcomponent._instance.props = nextProps;
+  nextComponent._instance.props = nextProps;
 
   if (_instance.shouldComponentUpdate()) {
     const prevRenderedElement = _currentElement;

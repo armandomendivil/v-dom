@@ -1,5 +1,20 @@
 import { mount, Component } from './vdom';
 
+class NestedApp extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  shouldComponentUpdate() {
+    return this.props.counter % 2;
+  }
+
+  render() {
+    return (
+      <h1>Nested result .. {this.props.counter}</h1>
+    )
+  }
+}
 
 class App extends Component {
   constructor() {
@@ -30,6 +45,7 @@ class App extends Component {
         <button onClick={this.onDecrease}>Decrease</button>
         <button onClick={this.onIncrease}>Increase</button>
         <h3>{this.state.counter}</h3>
+       <NestedApp counter={this.state.counter}/>
       </div>
     );
   }
