@@ -5,7 +5,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      count: 1,
+      counter: 1,
     };
 
     this.onIncrease = this.onIncrease.bind(this);
@@ -13,16 +13,23 @@ class App extends Component {
   }
 
   onIncrease() {
-    console.log('Increase');
+    this.setState({
+      counter: this.state.counter + 1,
+    });
   }
 
-  onDecrease() {}
+  onDecrease() {
+    this.setState({
+      counter: this.state.counter - 1,
+    });
+  }
 
   render() {
     return (
       <div>
-        <button onClick={this.onIncrease}>click</button>
-        <h3>{this.state.count}</h3>
+        <button onClick={this.onDecrease}>Decrease</button>
+        <button onClick={this.onIncrease}>Increase</button>
+        <h3>{this.state.counter}</h3>
       </div>
     );
   }

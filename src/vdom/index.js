@@ -25,7 +25,6 @@ export function createVElement(type, props, ...children) {
 }
 
 export function createVComponent(type, props) {
-  console.log('Create component')
   return {
     type,
     props,
@@ -42,8 +41,12 @@ export function mountVElement(vElement, parentDOMNode) {
   const domNode = document.createElement(vElement.type);
   vElement.dom = domNode;
 
-  if (Array.isArray(children)) {
-    children.forEach(child => mount(child, domNode));
+  if (children) {
+    if (!Array.isArray(children)) {
+      mount(children, domNode);
+    } else {
+      children.forEach(child => mount(child, domNode));
+    }
   }
 
   if (isDef(props.className)) {
@@ -63,11 +66,20 @@ export function mountVElement(vElement, parentDOMNode) {
 
 export function mountVComponent(vComponent, parentDOMNode) {
   const { props, type } = vComponent;
+
   const Component = type;
   const instance = new Component(props);
 
   const nextElement = instance.render();
+
+  instance._currentElement = nextElement;
+  instance._parentNode = parentDOMNode;
+
+
   const dom = mount(nextElement, parentDOMNode);
+
+  vComponent._instance = instance;
+  vComponent.dom = dom;
 
   parentDOMNode.appendChild(dom);
 
@@ -106,9 +118,107 @@ export function addEventListeners ($target, props) {
   });
 }
 
+function update(prevElement, nextElement) {
+  if (prevElement.type === nextElement.type) {
+    if (isString(prevElement.type)) {
+      updateVElement(prevElement, nextElement);
+    } else if (isFunction(prevElement.type)) {
+      updateVComponent(prevElement, nextElement);
+    }
+  } else {
+    // ---
+  }
+}
+
+export function updateVElement(prevElement, nextElement) {
+  const dom = prevElement.dom;
+  nextElement.dom = dom;
+  if (nextElement.children) {
+    updateChildren(prevElement.children, nextElement.children, dom);
+  }
+}
+
+export function updateVComponent (prevComponent, nextComponent) {
+  const { _instance } = prevComponent;
+  const { _currentElement } = _instance;
+
+  const prevProps = prevComponent.props;
+  const nextprops = nextComponent.props;
+
+  nextComponent.dom = prevComponent.dom;
+  nextComponent._instance = _instance;
+  nextcomponent._instance.props = nextProps;
+
+  if (_instance.shouldComponentUpdate()) {
+    const prevRenderedElement = _currentElement;
+    const nextRenderedElement = _instance.render();
+    //finaly save the nextRenderedElement for the next iteration!
+    nextComponent._instance._currentElement = nextRenderedElement;
+    //call update 
+    update(prevRenderedElement, nextRenderedElement, _instance._parentNode);
+  }
+}
+
+function updateChildren(prevChildren, nextChildren, parentDOMNode) {
+  if (!Array.isArray(nextChildren)) {
+    nextChildren = [nextChildren];
+  }
+  if (!Array.isArray(prevChildren)) {
+    prevChildren = [prevChildren];
+  }
+
+  for (let i = 0; i < nextChildren.length; i++) {
+
+    const nextChild = nextChildren[i];
+    const prevChild = prevChildren[i];
+
+    if (isPrimitive(nextChild) && isPrimitive(prevChild)) {
+      updateVText(prevChild, nextChild, parentDOMNode);
+      // continue;
+    } else {
+      update(prevChild, nextChild);
+    }
+  }
+}
+
+export function updateVText(prevVText, nextText, parentDOMNode) {
+  if (prevVText !== nextText) {
+    parentDOMNode.firstChild.nodeValue = nextText;
+  }
+}
+
 export class Component {
   constructor(props) {
     this.props = props || {};
+    this.state = {};
+
+    this._pendingState = null;
+    this._currentElement = null;
+    this._parentNode = null;
+  }
+
+  shouldComponentUpdate() {
+    return true;
+  }
+
+  updateComponent() {
+    const prevState = this.state;
+    const prevElement = this._currentElement;
+
+    if (this._pendingState !== prevState) {
+      this.state = this._pendingState;
+    }
+
+    this._pendingState = null;
+    const nextElement = this.render();
+    this._currentElement = nextElement;
+
+    update(prevElement, nextElement, this._parentNode);
+  }
+
+  setState(partialNewState) {
+    this._pendingState = Object.assign({}, this.state, partialNewState);
+    this.updateComponent();
   }
 
   render() {}
