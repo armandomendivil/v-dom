@@ -152,9 +152,7 @@ export function updateVComponent (prevComponent, nextComponent) {
   if (_instance.shouldComponentUpdate()) {
     const prevRenderedElement = _currentElement;
     const nextRenderedElement = _instance.render();
-    //finaly save the nextRenderedElement for the next iteration!
     nextComponent._instance._currentElement = nextRenderedElement;
-    //call update 
     update(prevRenderedElement, nextRenderedElement, _instance._parentNode);
   }
 }
@@ -174,7 +172,6 @@ function updateChildren(prevChildren, nextChildren, parentDOMNode) {
 
     if (isPrimitive(nextChild) && isPrimitive(prevChild)) {
       updateVText(prevChild, nextChild, parentDOMNode);
-      // continue;
     } else {
       update(prevChild, nextChild);
     }
