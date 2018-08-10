@@ -34,7 +34,7 @@ export function createVComponent(type, props) {
 }
 
 export function mountVElement(vElement, parentDOMNode) {
-  const { children, props } = vElement;
+  let { children, props } = vElement;
   const domNode = document.createElement(vElement.type);
   vElement.dom = domNode;
 
@@ -68,7 +68,9 @@ export function mountVComponent(vComponent, parentDOMNode) {
 
   const instance = new Component(props);
  
-  const nextElement = instance.render();
+  const nextElement =  instance.render();
+
+  console.log('COM', nextElement);
 
   instance._currentElement = nextElement;
   instance._parentNode = parentDOMNode;
@@ -86,6 +88,7 @@ export function mountVComponent(vComponent, parentDOMNode) {
 
 export function mount(input, parentDOMNode) {
   if (isPrimitive(input)) {
+    console.log(input)
     // Text input
     return setTextContent(parentDOMNode, input);
   } else if (isFunction(input.type)) {
